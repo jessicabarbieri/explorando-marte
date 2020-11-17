@@ -1,5 +1,5 @@
 import './App.css';
-import { Button, Form, FormGroup, Label, Input, Row, Col, FormText } from 'reactstrap';
+import { Button, Form, Label, Input, Row, Col } from 'reactstrap';
 import React, { useState } from 'react';
 
 const initialValue = {
@@ -24,7 +24,7 @@ function App(props) {
 
   function onSubmit(ev) {
     ev.preventDefault();
-    console.log(values)
+    //console.log(values)
     calcular(values)
   }
 
@@ -76,9 +76,7 @@ function App(props) {
                 <Button outline color="primary" type="submit" onClick={onSubmit}>Calcular</Button>
               </Row>
 
-              <Row className="espacamento align-center" id="resultado" name="resultado">
-              
-              </Row>
+              <Row className="espacamento align-center" id="resultado" name="resultado"></Row>
         
             </div>
           </div>
@@ -88,18 +86,146 @@ function App(props) {
   );
 }
 
-
-
-
 function calcular(values) {
 
   values.posicaoX = parseInt(values.posicaoX);
   values.posicaoY = parseInt(values.posicaoY);
 
-  //validaCampos(values);
+  validaCampos(values);
   //executaMovimentos(values)
 }
 
+function validaCampos(values) {
 
+  var alturaMapa = document.getElementById('alturaMapa').value;
+  var larguraMapa = document.getElementById('larguraMapa').value; 
+  var direcao = document.getElementById('direcao').value; 
+  var sequencia = document.getElementById('sequencia').value; 
+  var posicaoX = document.getElementById('posicaoX').value; 
+  var posicaoY = document.getElementById('posicaoY').value; 
+
+  if (alturaMapa == '' || larguraMapa == '' || direcao == '' 
+      || sequencia == '' || posicaoX == '' || posicaoY == '') {
+        alert("Preencha todos os campos!");
+  }
+
+  if((direcao != 'N') || (direcao != 'S') || (direcao != 'E') || (direcao != 'W')) {
+    alert("Informe uma direção válida! As letras possíveis são N, S, E, e W.");
+  }
+  
+  for (var i = 0; i < sequencia.length; i++) {
+    if ((!sequencia[i] == "M") && (sequencia[i] == "L") && (sequencia[i] == "R")) {
+      alert("Informe uma sequencia válida! As letras possíveis são L, R e M.");
+    }
+  }
+
+  executaMovimentos(values);
+
+}
+
+function executaMovimentos(values) {
+
+  for (var i = 0; i < values.sequencia.length; i++) {
+    
+      if (values.sequencia[i] == 'M')
+          moverParaFrente(values);
+      
+      else if (values.sequencia[i] == 'L')
+          virar90GrausEsquerda(values);
+     
+      else if (values.sequencia[i] == 'R')
+          virar90GrausDireita(values);
+
+  }
+
+  limparCampos();
+  
+  var element = document.getElementById('resultado');
+  element.innerHTML = '<b> Resultado: '+ values.posicaoX + ', ' + values.posicaoY + ', ' + values.direcao +'</b>'
+    
+}
+
+function limiteMapa(posicaoX, posicaoY, larguraMapa, alturaMapa) {
+  if ((posicaoX >= 0 && posicaoX <= larguraMapa) && (posicaoY >= 0 && posicaoY <= alturaMapa)) {
+    return true;
+  }
+  
+  else {
+    alert("A posição excede o tamanho limite do mapa!");
+    return false;
+  }
+}
+
+function moverParaFrente(values) {
+
+  if(values.direcao == "N") {
+    if (limiteMapa(values.posicaoX, values.posicaoY+1, values.larguraMapa, values.alturaMapa)) {
+          values.posicaoY += 1;
+        }
+  }
+    
+  else if (values.direcao == "S") {
+    if (limiteMapa(values.posicaoX, values.posicaoY-1, values.larguraMapa, values.alturaMapa)) {
+      values.posicaoY -= 1;
+    }
+  }
+
+  else if (values.direcao == "E") {
+    if (limiteMapa(values.posicaoX+1, values.posicaoY, values.larguraMapa, values.alturaMapa)) {
+      values.posicaoX += 1;
+    }
+  }
+
+  else if (values.direcao == "W") {
+    if (limiteMapa(values.posicaoX-1, values.posicaoY, values.larguraMapa, values.alturaMapa)) {
+      values.posicaoX -= 1;
+    }
+  }
+}
+
+function virar90GrausEsquerda(values) {
+  
+  switch (values.direcao) {
+      case 'N': values.direcao = 'W';
+          break;
+
+      case 'S': values.direcao = 'E';
+          break;
+
+      case 'E': values.direcao = 'N';
+          break;
+
+      case 'W': values.direcao = 'S';
+          break;
+  }
+}
+
+function virar90GrausDireita(values) {
+  
+  switch (values.direcao) {
+      case 'N': values.direcao = 'E';
+          break;
+
+      case 'S': values.direcao = 'W';
+          break;
+
+      case 'E': values.direcao = 'S';
+          break;
+
+      case 'W': values.direcao = 'N';
+          break;
+  }
+}
+
+function limparCampos() {
+
+  document.getElementById('alturaMapa').value='';
+  document.getElementById('larguraMapa').value=''; 
+  document.getElementById('direcao').value=''; 
+  document.getElementById('sequencia').value=''; 
+  document.getElementById('posicaoX').value=''; 
+  document.getElementById('posicaoY').value=''; 
+  
+}
 
 export default App;
